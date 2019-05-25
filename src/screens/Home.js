@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, FlatList, View } from 'react-native';
 import { Container, Drawer, Content, Header, Left, Body, Icon, Right, Button, Title, CardItem, Card, Segment, Text} from 'native-base';
-
+import axios from 'axios';
 import SideBar from './SideBar';
 
 class Home extends Component {
   constructor(props) {
   super(props);
+  this.state = {
+      schedules: []
+    };
   this.firstpage=this.firstpage.bind(this);
   this.secondpage=this.secondpage.bind(this);
     this.state = {
@@ -14,6 +17,14 @@ class Home extends Component {
       firstpageactive:true,
       secondpageactive:false,
     } ;
+  }
+
+  componentDidMount() {
+    axios.get('http://192.168.1.5:3333/api/v1/schedules')
+      .then(res => {
+        const schedules = res.data.result;
+        this.setState({ schedules });
+      })
   }
 
   firstpage(){
@@ -40,71 +51,26 @@ class Home extends Component {
     const page = this.state.page ;
     let shows = null;
     if (page == 1 ){
-      shows = <Card>
-                <CardItem header bordered>
-                  <Text style={{fontSize:20}}>Monday</Text>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Matematika</Text></Body>
-                  <Right><Text note>07:30 - 09: 00</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Kimia</Text></Body>
-                  <Right><Text note>09:10 - 12: 10</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Bahasa Inggris</Text></Body>
-                  <Right><Text note>13:00 - 14: 30</Text></Right>
-                </CardItem>
+      shows =
+              <FlatList
+              data={this.state.schedules}
+              renderItem={({item}) =>(
+                <Card>
+                  <CardItem header bordered>
+                    <Text style={{fontSize:20}}>{item.day}</Text>
+                  </CardItem>
 
-                <CardItem header bordered>
-                  <Text style={{fontSize:20}}>Tuesday</Text>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Bahasa Indonesia</Text></Body>
-                  <Right><Text note>07:30 - 09: 00</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Fisika</Text></Body>
-                  <Right><Text note>09:10 - 12: 10</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Agama</Text></Body>
-                  <Right><Text note>13:00 - 14: 30</Text></Right>
-                </CardItem>
-
-                <CardItem header bordered>
-                  <Text style={{fontSize:20}}>Wednesday</Text>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Matematika</Text></Body>
-                  <Right><Text note>07:30 - 09: 00</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Kimia</Text></Body>
-                  <Right><Text note>09:10 - 12: 10</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Bahasa Inggris</Text></Body>
-                  <Right><Text note>13:00 - 14: 30</Text></Right>
-                </CardItem>
-
-                <CardItem header bordered>
-                  <Text style={{fontSize:20}}>Thursday</Text>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Bahasa Indonesia</Text></Body>
-                  <Right><Text note>07:30 - 09: 00</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Fisika</Text></Body>
-                  <Right><Text note>09:10 - 12: 10</Text></Right>
-                </CardItem>
-                <CardItem bordered>
-                  <Body><Text>Agama</Text></Body>
-                  <Right><Text note>13:00 - 14: 30</Text></Right>
-                </CardItem>
-              </Card>
+                  <CardItem bordered><Body>
+                  <FlatList
+                    data={item.subjects}
+                    renderItem={({ item }) => (
+                        <Text>{item.subject_name} {item.schedule_start} - {item.schedule_end}</Text>
+                    )}
+                    keyExtractor={(item, index) => String(item.id)}
+                  /></Body></CardItem>
+                </Card>
+              )}
+              keyExtractor={(item, index) => index.toString()} />
 
     }else if (page == 2) {
       shows = <Text> hello page 2 </Text>
