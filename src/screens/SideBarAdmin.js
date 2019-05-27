@@ -25,7 +25,7 @@ class SideBarAdmin extends Component {
   }
 
   checkToken = async () => {
-    const token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImlhdCI6MTU1ODk1NTIwN30.CtpRfc8ZSSaX1Idq4T01N1mnqq1h0lG04VmbdZ7HuMs';
+    const token= await AsyncStorage.getItem('token');
 
       axios.get(`http://192.168.1.5:3333/api/v1/user`, {
         headers: {
@@ -54,6 +54,12 @@ class SideBarAdmin extends Component {
             this.setState({ user: {}, access_token: {}})
             AsyncStorage.removeItem('token')
             this.props.navigation.navigate('Home')
+            Toast.show({
+              text: "See you...",
+              buttonText: "Okay",
+              duration: 1500,
+              type: "dark"
+            })
           }
         },
       ],
@@ -64,26 +70,35 @@ class SideBarAdmin extends Component {
     return(
       <Content style={{backgroundColor: '#3a81f7'}}>
         <Thumbnail square source={require('./assets/foto.jpg')} style={styles.imageLogo}/>
-        <Text style={styles.txtlogo}>{this.state.user.username}</Text>
+        <Text style={styles.txtlogo}>Hello, {this.state.user.username}</Text>
         <Card style={styles.sizeCard}>
           <CardItem>
-            <Button transparent onPress={() => { this.props.navigation.navigate('Login')}}>
-              <Icon name="pencil" type="FontAwesome" style={{ color: "#3a81f7"}}/>
-              <Text style={{ color: "#3a81f7"}}>CRUD Teachers</Text>
+            <Button transparent onPress={() => { this.props.navigation.navigate('Teachers')}}>
+              <Icon name="person" style={{ color: "#3a81f7"}}/>
+              <Text style={{ color: "#3a81f7"}}>Data Teachers</Text>
             </Button>
           </CardItem>
+        </Card>
+
+        <Card style={styles.Card}>
           <CardItem>
-            <Button transparent onPress={() => { this.props.navigation.navigate('Login')}}>
-              <Icon name="pencil" type="FontAwesome" style={{ color: "#3a81f7"}}/>
-              <Text style={{ color: "#3a81f7"}}>CRUD Subjects</Text>
+            <Button transparent onPress={() => { this.props.navigation.navigate('Subjects')}}>
+              <Icon name="book" type="FontAwesome" style={{ color: "#3a81f7"}}/>
+              <Text style={{ color: "#3a81f7"}}>Data Subjects</Text>
             </Button>
           </CardItem>
+        </Card>
+
+        <Card style={styles.Card}>
           <CardItem>
-            <Button transparent onPress={() => { this.props.navigation.navigate('Login')}}>
-              <Icon name="pencil" type="FontAwesome" style={{ color: "#3a81f7"}}/>
-              <Text style={{ color: "#3a81f7"}}>CRUD Schedules</Text>
+            <Button transparent onPress={() => { this.props.navigation.navigate('Schedule_Subject')}}>
+              <Icon name="calendar" type="FontAwesome" style={{ color: "#3a81f7"}}/>
+              <Text style={{ color: "#3a81f7"}}>Data Schedules</Text>
             </Button>
           </CardItem>
+        </Card>
+
+        <Card style={styles.Card}>
           <CardItem>
             <Button transparent onPress={() => this.logout()}>
               <Icon name="power-off" type="FontAwesome" style={{ color: "#3a81f7"}}/>
@@ -106,7 +121,7 @@ const styles = StyleSheet.create({
     marginTop:40
   },
   txtlogo: {
-    marginLeft:125,
+    marginLeft:103,
     fontWeight: 'bold',
     color: '#ffffff',
     fontSize: 18
@@ -121,5 +136,8 @@ const styles = StyleSheet.create({
   },
   sizeCard: {
     marginTop:60
+  },
+  Card: {
+    marginTop:10
   }
   });

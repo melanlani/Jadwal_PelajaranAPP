@@ -22,8 +22,10 @@ class HomeAdmin extends Component {
   }
 
   componentDidMount() {
+    const { navigation } = this.props;
+    const isLoggedIn = navigation.getParam("isLoggedIn", "");
     this.props.navigation.addListener('didFocus', () => {
-      if (this.props.isLoggedIn === false) {
+      if (isLoggedIn === false) {
         this.props.navigation.navigate('Login')
       }
       else {
@@ -33,8 +35,7 @@ class HomeAdmin extends Component {
   }
 
   checkToken = async () => {
-    const token = 'bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsImlhdCI6MTU1ODk1NTIwN30.CtpRfc8ZSSaX1Idq4T01N1mnqq1h0lG04VmbdZ7HuMs';
-
+    const token= await AsyncStorage.getItem('token');
       axios.get(`http://192.168.1.5:3333/api/v1/user`, {
         headers: {
             Authorization: token

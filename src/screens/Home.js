@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { StyleSheet, FlatList, View, Alert } from 'react-native';
 import { Container, Drawer, Content, Header, Left, Body, Icon, Right, Button, Title, CardItem, Card, Segment, Text, Picker, Form} from 'native-base';
 import axios from 'axios';
+import AsyncStorage from '@react-native-community/async-storage';
 import SideBar from './SideBar';
 import Schedules from './schedules'
 
@@ -20,21 +21,30 @@ class Home extends Component {
       secondpageactive:false,
     } ;
   }
-
+  _loadInitialState = async () => {
+    var value = await AsyncStorage.getItem('token');
+    if(value !== null) {
+      this.props.navigation.navigate('HomeAdmin')
+    } else{
+      axios.get('http://192.168.1.5:3333/api/v1/schedules')
+        .then(res => {
+          const schedules = res.data.result;
+          this.setState({ schedules });
+        })
+      axios.get('http://192.168.1.5:3333/api/v1/teachers')
+        .then(res => {
+          this.setState({
+              dataSource: res.data.result
+            }, function() {
+              // In this block you can do something with new state.
+            });
+        })
+    }
+  }
   componentDidMount() {
-    axios.get('http://192.168.1.5:3333/api/v1/schedules')
-      .then(res => {
-        const schedules = res.data.result;
-        this.setState({ schedules });
-      })
-    axios.get('http://192.168.1.5:3333/api/v1/teachers')
-      .then(res => {
-        this.setState({
-            dataSource: res.data.result
-          }, function() {
-            // In this block you can do something with new state.
-          });
-      })
+    this.props.navigation.addListener('didFocus', () => {
+      this._loadInitialState();
+    })
   }
 
   firstpage(){

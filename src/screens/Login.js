@@ -30,11 +30,17 @@ class Login extends Component {
     .then(res => {
       if (res.data.success === true) {
         const { token, type } = res.data.access_token
-        AsyncStorage.setItem('token', JSON.stringify(type + ' ' + token));
+        AsyncStorage.setItem('token', type + ' ' + token);
         this.setState({ isLoggedIn:true });
         this.props.navigation.navigate('HomeAdmin', {
           isLoggedIn: this.state.isLoggedIn
         });
+        Toast.show({
+          text: "Welcome to Admin Page",
+          buttonText: "Okay",
+          duration: 1500,
+          type: "dark"
+        })
       }
       else{
         alert('Email/Password is wrong');

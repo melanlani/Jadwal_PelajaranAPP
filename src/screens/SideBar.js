@@ -2,9 +2,12 @@ import React, { Component } from 'react';
 import { withNavigation } from 'react-navigation';
 import { StyleSheet } from 'react-native';
 import { Content,Button,Text,Card,Left, Right, CardItem, Icon, Thumbnail } from 'native-base';
+import axios from 'axios';
+import AsyncStorage from '@react-native-community/async-storage';
 
 class SideBar extends Component {
   render(){
+    
     return(
       <Content style={{backgroundColor: '#3a81f7'}}>
         <Thumbnail circle source={require('./assets/logo.png')} style={styles.imageLogo}/>
