@@ -11,7 +11,7 @@ class SideBar extends Component {
         <Text style={styles.txtlogo}>Schedules</Text>
         <Card style={styles.sizeCard}>
           <CardItem>
-            <Button transparent>
+            <Button transparent onPress={() => { this.props.navigation.navigate('Login')}}>
               <Icon name="person" style={{ color: "#3a81f7"}}/>
               <Text style={{ color: "#3a81f7"}}>Login</Text>
             </Button>
