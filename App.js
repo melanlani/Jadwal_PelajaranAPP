@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import {Platform, StyleSheet, Text, View} from 'react-native';
 import {createStackNavigator, createAppContainer} from 'react-navigation';
 import { Icon, Root } from 'native-base';
+import { Provider } from 'react-redux';
+import store from './src/redux/store';
+
 import Home from './src/screens/Home';
 import Schedules from './src/screens/schedules';
 import Login from './src/screens/Login';
@@ -9,6 +12,8 @@ import HomeAdmin from './src/screens/HomeAdmin';
 import Teachers from './src/screens/Teachers';
 import Subjects from './src/screens/Subjects';
 import Schedule_Subject from './src/screens/Schedule_Subject';
+import InputTeacher from './src/screens/InputTeacher';
+import UpdateTeacher from './src/screens/UpdateTeacher';
 
 const MainNavigator = createStackNavigator(
   {
@@ -41,11 +46,18 @@ const MainNavigator = createStackNavigator(
       header: null,
     }
   },
-  Teachers: {
+  Teachers : {
     screen: Teachers,
-    headerMode: 'none',
+    headerMode: '',
     navigationOptions: {
-      header: null,
+      title: 'Data Teachers',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
     }
   },
   Subjects: {
@@ -62,6 +74,37 @@ const MainNavigator = createStackNavigator(
       header: null,
     }
   },
+
+  InputTeacher : {
+    screen: InputTeacher,
+    headerMode: '',
+    navigationOptions: {
+      title: 'Input Teacher',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
+
+  UpdateTeacher : {
+    screen: UpdateTeacher,
+    headerMode: '',
+    navigationOptions: {
+      title: 'Update Teacher',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
+
 },
 
   {
@@ -78,9 +121,13 @@ type Props = {};
 export default class App extends Component<Props> {
   render(){
     return(
-      <Root>
-        <AppContainer  />
-      </Root>
+
+      <Provider store={store}>
+        {/* {children} */}
+        <Root>
+       <AppContainer  />
+       </Root>
+      </Provider>
     );
   }
 

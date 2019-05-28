@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, FlatList, View, Alert } from 'react-native';
+import { StyleSheet, FlatList, View, Alert, ActivityIndicator } from 'react-native';
 import { Container, Drawer, Content, Header, Left, Body, Icon, Right, Button, Title, CardItem, Card, Segment, Text, Picker, Form} from 'native-base';
 import axios from 'axios';
 import SideBarAdmin from './SideBarAdmin';
@@ -10,7 +10,8 @@ class HomeAdmin extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      user: {}
+      user: {},
+      loading: true
     };
   }
 
@@ -29,6 +30,11 @@ class HomeAdmin extends Component {
         this.props.navigation.navigate('Login')
       }
       else {
+          setTimeout(() => {
+            this.setState({
+              loading :false
+            })
+          }, 100)
           this.checkToken();
       }
     })
@@ -53,22 +59,29 @@ class HomeAdmin extends Component {
       <Drawer ref={(ref) => { this._drawer = ref; }}
         content={<SideBarAdmin navigator={this._navigator} />}
         onClose={() => this.closeDrawer()} >
-        <Container>
-          <Header>
-            <Left>
-              <Button transparent onPress={() => this.openDrawer()}>
-                <Icon name='menu' />
-              </Button>
-            </Left>
-            <Body>
-              <Title>Schedules</Title>
-            </Body>
-          </Header>
+        {
+          this.state.loading ?
+          <View style={styles.container} >
+            <ActivityIndicator size="large" color="#ffffff" />
+          </View>
+          :
+          <Container>
+            <Header>
+              <Left>
+                <Button transparent onPress={() => this.openDrawer()}>
+                  <Icon name='menu' />
+                </Button>
+              </Left>
+              <Body>
+                <Title>Schedules</Title>
+              </Body>
+            </Header>
 
-          <Content>
-            <Text>Welcome to Member Page {this.state.user.username}</Text>
-          </Content>
-        </Container>
+            <Content>
+              <Text>Welcome to Member Page {this.state.user.username}</Text>
+            </Content>
+          </Container>
+        }
       </Drawer>
 
       );
@@ -79,6 +92,11 @@ const styles = StyleSheet.create({
 
   header: {
     backgroundColor: '#f76710',
+  },
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    backgroundColor: '#3a81f7',
   },
 
 });

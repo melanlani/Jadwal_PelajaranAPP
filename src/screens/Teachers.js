@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
-import { StyleSheet, FlatList, View, Alert } from 'react-native';
-import { Container, Drawer, Content, Header, Left, Body, Icon, Right, Button, Title, CardItem, Card, Segment, Text, Picker, Form, Spinner} from 'native-base';
+import { StyleSheet, FlatList, View, Alert, ActivityIndicator } from 'react-native';
+import { Container, Drawer, Content, Header, Left, Body, Icon, Right, Button, Title, CardItem, Card, Segment, Text, Picker, Form, Spinner, Toast} from 'native-base';
 import axios from 'axios';
+import { withNavigation } from 'react-navigation';
 import SideBarAdmin from './SideBarAdmin';
 import Schedules from './schedules'
 import AsyncStorage from '@react-native-community/async-storage';
+import { connect } from 'react-redux';
+import { getTeachers, deleteTeachers} from '../redux/actions/teachers';
 
 class Teachers extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      teachers: [],
-      loading: false
+      teachers: []
     };
   }
 
@@ -23,25 +25,10 @@ class Teachers extends Component {
   }
 
   componentDidMount() {
-    this.checkToken();
-    axios.get('http://192.168.1.5:3333/api/v1/teachers')
-      .then(res => {
-        const teachers = res.data.result;
-        this.setState({ teachers: teachers, loading:true });
-      })
-  }
+    setTimeout(() => {
+      this.props.getTeachersDispatch()
+    }, 500)
 
-  checkToken = async () => {
-    const token= await AsyncStorage.getItem('token');
-      axios.get(`http://192.168.1.5:3333/api/v1/user`, {
-        headers: {
-            Authorization: token
-        }
-      })
-      .then(res => {
-        const user = res.data.user;
-        this.setState({ user });
-      })
   }
 
   deleteItem(id) {
@@ -55,12 +42,12 @@ class Teachers extends Component {
         },
         { text: 'OK', onPress: () =>
           {
-            axios.delete(`http://192.168.1.5:3333/api/v1/teachers/${id}`);
+            this.props.deleteTeachersDispatch(id)
+            this.componentDidMount()
             Toast.show({
               text: 'Deleted Success',
               duration: 1500
             })
-            this.props.navigation.navigate('Teachers')
           }
         },
       ],
@@ -69,75 +56,68 @@ class Teachers extends Component {
   }
 
   render() {
+    const { teachers, pending } = this.props
+    if (pending) {
+      return(
+        <View style={styles.container}>
+          <ActivityIndicator color="#ffffff" size="large"  />
+        </View>
+      )
+    }
+    else {
+      return (
 
-    return (
-      <Drawer ref={(ref) => { this._drawer = ref; }}
-        content={<SideBarAdmin navigator={this._navigator} />}
-        onClose={() => this.closeDrawer()} >
-        <Container>
-          <Header>
-            <Left>
-              <Button transparent onPress={() => this.openDrawer()}>
-                <Icon name='menu' />
-              </Button>
-            </Left>
-            <Body>
-              <Title>Schedules</Title>
-            </Body>
-          </Header>
+          <Container>
+            <Content>
+            <Card>
+              <CardItem header bordered>
+                <Left>
+                  <Text style={styles.txtsubtitle}>List Teachers</Text>
+                </Left>
+                <Right>
+                  <Button primary small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('InputTeacher')}}>
+                    <Icon name="plus" type="FontAwesome"/>
+                    <Text>Input</Text>
+                  </Button>
+                </Right>
+              </CardItem>
+            </Card>
+            <FlatList
+              data={teachers}
+              renderItem={({item}) =>(
 
-          <Content>
-          <Card>
-            <CardItem header bordered>
-              <Left>
-                <Text style={styles.txtsubtitle}>Data Teachers</Text>
-              </Left>
-              <Right>
-                <Button primary small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('HomeAdmin', {
-                  id: item.id
-                })}}>
-                  <Icon name="plus" type="FontAwesome"/>
-                  <Text>Input</Text>
-                </Button>
-              </Right>
-            </CardItem>
-          </Card>
-          <FlatList
-            data={this.state.teachers}
-            renderItem={({item}) =>(
+                <Card>
+                  <CardItem>
+                    <Left>
+                      <Text style={{fontSize:20}}>{item.teacher_name}</Text>
+                    </Left>
+                  </CardItem>
+                  <CardItem>
+                    <Left>
+                      <Button success small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('UpdateTeacher', {
+                        id: item.id
+                      })}}>
+                        <Text>Edit</Text>
+                      </Button>
+                    </Left>
+                    <Body>
+                      <Button danger small style={styles.btnDelete} onPress={() => this.deleteItem(item.id)} >
+                        <Text>Delete</Text>
+                      </Button>
+                    </Body>
+                    <Right>
+                    </Right>
+                  </CardItem>
+                </Card>
+              )}
+            keyExtractor={(item, index) => index.toString()}
+            />
+            </Content>
+          </Container>
 
-              <Card>
-                <CardItem>
-                  <Left>
-                    <Text style={{fontSize:20}}>{item.teacher_name}</Text>
-                  </Left>
-                </CardItem>
-                <CardItem>
-                  <Left>
-                    <Button success small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('HomeAdmin', {
-                      id: item.id
-                    })}}>
-                      <Text>Edit</Text>
-                    </Button>
-                  </Left>
-                  <Body>
-                    <Button danger small style={styles.btnDelete} onPress={() => this.deleteItem(item.id)} >
-                      <Text>Delete</Text>
-                    </Button>
-                  </Body>
-                  <Right>
-                  </Right>
-                </CardItem>
-              </Card>
-            )}
-          keyExtractor={(item, index) => index.toString()}
-          />
-          </Content>
-        </Container>
-      </Drawer>
 
       );
-
+    }
   }
 }
 const styles = StyleSheet.create({
@@ -148,8 +128,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#3a81f7',
   },
   welcome: {
     fontSize: 20,
@@ -209,5 +188,20 @@ const styles = StyleSheet.create({
 
 });
 
+const mapStateToProps = state => ({
+  pending: state.teachers.pending,
+  teachers: state.teachers.data
+})
 
-export default Teachers;
+const mapDispatchToProps = dispatch => {
+  return {
+    getTeachersDispatch: () => {
+      dispatch(getTeachers())
+    },
+    deleteTeachersDispatch: (id) => {
+      dispatch(deleteTeachers(id))
+    },
+  }
+}
+
+export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(Teachers));

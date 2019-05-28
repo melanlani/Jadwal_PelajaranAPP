@@ -14,14 +14,7 @@ class SideBarAdmin extends Component {
     };
   }
   componentDidMount() {
-    this.props.navigation.addListener('didFocus', () => {
-      if (this.props.isLoggedIn === false) {
-        this.props.navigation.navigate('Login')
-      }
-      else {
-          this.checkToken();
-      }
-    })
+    this.checkToken();
   }
 
   checkToken = async () => {
