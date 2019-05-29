@@ -15,13 +15,6 @@ class Schedule_Subject extends Component {
     };
   }
 
-  closeDrawer () {
-    this._drawer._root.close()
-  }
-  openDrawer () {
-    this._drawer._root.open()
-  }
-
   componentDidMount() {
     this.checkToken();
     axios.get('http://192.168.1.5:3333/api/v1/schedules')
@@ -71,20 +64,8 @@ class Schedule_Subject extends Component {
   render() {
 
     return (
-      <Drawer ref={(ref) => { this._drawer = ref; }}
-        content={<SideBarAdmin navigator={this._navigator} />}
-        onClose={() => this.closeDrawer()} >
+
         <Container>
-          <Header>
-            <Left>
-              <Button transparent onPress={() => this.openDrawer()}>
-                <Icon name='menu' />
-              </Button>
-            </Left>
-            <Body>
-              <Title>Schedules</Title>
-            </Body>
-          </Header>
 
           <Content>
           <Card>
@@ -108,9 +89,7 @@ class Schedule_Subject extends Component {
                   </CardItem>
                 ))}
                 <CardItem>
-                  <Button primary small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('HomeAdmin', {
-                    id: item.id
-                  })}}>
+                  <Button primary small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('UpdateSchedule')}}>
                     <Icon name="pencil" type="FontAwesome"/>
                     <Text>Update</Text>
                   </Button>
@@ -121,7 +100,7 @@ class Schedule_Subject extends Component {
           />
           </Content>
         </Container>
-      </Drawer>
+
 
       );
 

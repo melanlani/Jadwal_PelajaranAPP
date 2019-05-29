@@ -10,24 +10,9 @@ import { connect } from 'react-redux';
 import { getTeachers, deleteTeachers} from '../redux/actions/teachers';
 
 class Teachers extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      teachers: []
-    };
-  }
-
-  closeDrawer () {
-    this._drawer._root.close()
-  }
-  openDrawer () {
-    this._drawer._root.open()
-  }
 
   componentDidMount() {
-    setTimeout(() => {
-      this.props.getTeachersDispatch()
-    }, 500)
+    this.props.getTeachersDispatch()
 
   }
 
@@ -42,8 +27,12 @@ class Teachers extends Component {
         },
         { text: 'OK', onPress: () =>
           {
-            this.props.deleteTeachersDispatch(id)
-            this.componentDidMount()
+            setTimeout(() => {
+              this.props.deleteTeachersDispatch(id)
+            }, 500)
+            setTimeout(() => {
+              this.componentDidMount()
+            }, 1500)
             Toast.show({
               text: 'Deleted Success',
               duration: 1500

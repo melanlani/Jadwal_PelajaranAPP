@@ -1,47 +1,19 @@
 import React, { Component } from 'react';
-import { StyleSheet, FlatList, View, Alert } from 'react-native';
-import { Container, Drawer, Content, Header, Left, Body, Icon, Right, Button, Title, CardItem, Card, Segment, Text, Picker, Form, Spinner} from 'native-base';
+import { StyleSheet, FlatList, View, Alert, ActivityIndicator } from 'react-native';
+import { Container, Drawer, Content, Header, Left, Body, Icon, Right, Button, Title, CardItem, Card, Segment, Text, Picker, Form, Spinner, Toast} from 'native-base';
 import axios from 'axios';
+import { withNavigation } from 'react-navigation';
 import SideBarAdmin from './SideBarAdmin';
 import Schedules from './schedules'
 import AsyncStorage from '@react-native-community/async-storage';
+import { connect } from 'react-redux';
+import { getSubjects, deleteSubjects} from '../redux/actions/subjects';
 
 class Subjects extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      subjects: [],
-      loading: false
-    };
-  }
-
-  closeDrawer () {
-    this._drawer._root.close()
-  }
-  openDrawer () {
-    this._drawer._root.open()
-  }
 
   componentDidMount() {
-    this.checkToken();
-    axios.get('http://192.168.1.5:3333/api/v1/subjects')
-      .then(res => {
-        const subjects = res.data.result;
-        this.setState({ subjects: subjects, loading:true });
-      })
-  }
+      this.props.getSubjectsDispatch()
 
-  checkToken = async () => {
-    const token= await AsyncStorage.getItem('token');
-      axios.get(`http://192.168.1.5:3333/api/v1/user`, {
-        headers: {
-            Authorization: token
-        }
-      })
-      .then(res => {
-        const user = res.data.user;
-        this.setState({ user });
-      })
   }
 
   deleteItem(id) {
@@ -55,12 +27,16 @@ class Subjects extends Component {
         },
         { text: 'OK', onPress: () =>
           {
-            axios.delete(`http://192.168.1.5:3333/api/v1/subjects/${id}`);
+            setTimeout(() => {
+              this.props.deleteSubjectsDispatch(id)
+            }, 500)
+              setTimeout(() => {
+                this.componentDidMount()
+              }, 1500)
             Toast.show({
               text: 'Deleted Success',
               duration: 1500
             })
-            this.props.navigation.navigate('Subjects')
           }
         },
       ],
@@ -69,22 +45,17 @@ class Subjects extends Component {
   }
 
   render() {
-
-    return (
-      <Drawer ref={(ref) => { this._drawer = ref; }}
-        content={<SideBarAdmin navigator={this._navigator} />}
-        onClose={() => this.closeDrawer()} >
+    const { subjects, pending } = this.props
+    if (pending) {
+      return(
+        <View style={styles.container}>
+          <ActivityIndicator color="#ffffff" size="large"  />
+        </View>
+      )
+    }
+    else {
+      return (
         <Container>
-          <Header>
-            <Left>
-              <Button transparent onPress={() => this.openDrawer()}>
-                <Icon name='menu' />
-              </Button>
-            </Left>
-            <Body>
-              <Title>Schedules</Title>
-            </Body>
-          </Header>
 
           <Content>
           <Card>
@@ -93,9 +64,7 @@ class Subjects extends Component {
                 <Text style={styles.txtsubtitle}>Data Subjects</Text>
               </Left>
               <Right>
-                <Button primary small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('HomeAdmin', {
-                  id: item.id
-                })}}>
+                <Button primary small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('InputSubject')}}>
                   <Icon name="plus" type="FontAwesome"/>
                   <Text>Input</Text>
                 </Button>
@@ -103,7 +72,7 @@ class Subjects extends Component {
             </CardItem>
           </Card>
           <FlatList
-            data={this.state.subjects}
+            data={subjects}
             renderItem={({item}) =>(
 
               <Card>
@@ -117,7 +86,7 @@ class Subjects extends Component {
                 </CardItem>
                 <CardItem>
                   <Left>
-                    <Button success small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('HomeAdmin', {
+                    <Button success small style={styles.btnDelete} onPress={() => {this.props.navigation.navigate('UpdateSubject', {
                       id: item.id
                     })}}>
                       <Text>Edit</Text>
@@ -137,10 +106,9 @@ class Subjects extends Component {
           />
           </Content>
         </Container>
-      </Drawer>
 
       );
-
+    }
   }
 }
 const styles = StyleSheet.create({
@@ -151,8 +119,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#3a81f7',
   },
   welcome: {
     fontSize: 20,
@@ -212,5 +179,20 @@ const styles = StyleSheet.create({
 
 });
 
+const mapStateToProps = state => ({
+  pending: state.subjects.pending,
+  subjects: state.subjects.data
+})
 
-export default Subjects;
+const mapDispatchToProps = dispatch => {
+  return {
+    getSubjectsDispatch: () => {
+      dispatch(getSubjects())
+    },
+    deleteSubjectsDispatch: (id) => {
+      dispatch(deleteSubjects(id))
+    },
+  }
+}
+
+export default withNavigation(connect(mapStateToProps, mapDispatchToProps)(Subjects));

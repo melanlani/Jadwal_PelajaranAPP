@@ -14,6 +14,9 @@ import Subjects from './src/screens/Subjects';
 import Schedule_Subject from './src/screens/Schedule_Subject';
 import InputTeacher from './src/screens/InputTeacher';
 import UpdateTeacher from './src/screens/UpdateTeacher';
+import InputSubject from './src/screens/InputSubject';
+import UpdateSubject from './src/screens/UpdateSubject';
+import UpdateSchedule from './src/screens/UpdateSchedule';
 
 const MainNavigator = createStackNavigator(
   {
@@ -60,18 +63,32 @@ const MainNavigator = createStackNavigator(
       }
     }
   },
-  Subjects: {
+  Subjects : {
     screen: Subjects,
-    headerMode: 'none',
+    headerMode: '',
     navigationOptions: {
-      header: null,
+      title: 'Data Subjects',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
     }
   },
-  Schedule_Subject: {
+  Schedule_Subject : {
     screen: Schedule_Subject,
-    headerMode: 'none',
+    headerMode: '',
     navigationOptions: {
-      header: null,
+      title: 'Data Schedules',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
     }
   },
 
@@ -105,6 +122,48 @@ const MainNavigator = createStackNavigator(
     }
   },
 
+  InputSubject : {
+    screen: InputSubject,
+    headerMode: '',
+    navigationOptions: {
+      title: 'Input Subject',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
+  UpdateSubject : {
+    screen: UpdateSubject,
+    headerMode: '',
+    navigationOptions: {
+      title: 'Update Subject',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
+  UpdateSchedule : {
+    screen: UpdateSchedule,
+    headerMode: '',
+    navigationOptions: {
+      title: 'Update Schedule',
+      headerStyle: {
+        backgroundColor: '#3a81f7',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      }
+    }
+  },
 },
 
   {

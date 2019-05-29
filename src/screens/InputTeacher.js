@@ -18,8 +18,10 @@ class InputTeacher extends Component {
   saveTeacher = () => {
     setTimeout(() => {
     this.props.addTeachersDispatch(this.state.teacher_name)
-    this.props.getTeachersDispatch()
   }, 100)
+    setTimeout(() => {
+    this.props.getTeachersDispatch()
+  }, 500)
     Toast.show({
         text: `Teacher's name added`,
         duration: 1500
