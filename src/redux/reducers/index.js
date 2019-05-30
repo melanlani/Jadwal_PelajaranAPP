@@ -2,11 +2,13 @@ import { combineReducers } from 'redux';
 
 import teachers from './teachers';
 import subjects from './subjects';
+import schedules from './schedules';
 // import messages from './messages';
 
 const reducers = combineReducers({
   teachers,
-  subjects
+  subjects,
+  schedules
   // messages
 })
 

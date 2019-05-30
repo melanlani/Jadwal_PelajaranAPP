@@ -2,42 +2,47 @@ import React, { Component } from 'react';
 import { StyleSheet, Alert, Image, Text, View, TouchableOpacity, ActivityIndicator, FlatList } from 'react-native';
 import { Container, Drawer, Content, Header, Left, Body, Right, Button,
   Icon, Title, CardItem, Card, Item, Input, Form, Picker, ListItem, CheckBox, Thumbnail, Toast} from 'native-base';
+import MultiSelect from 'react-native-multiple-select';
 import axios from 'axios';
 import { withNavigation } from 'react-navigation';
 import { connect } from 'react-redux';
-import { getTeachers } from '../redux/actions/teachers';
-import { getSubjects, showSubjects, updateSubjects} from '../redux/actions/subjects';
+import { getSubjects} from '../redux/actions/subjects';
+import { getSchedules, showSchedules, updateSchedules} from '../redux/actions/schedules';
 class UpdateSchedule extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      subject_name: '',
-      teacher_id: 0,
-      schedule_start: '',
-      schedule_end: ''
+      selectedItems: [],
+      day: ''
     }
   }
 
   componentDidMount() {
     const id = this.props.navigation.getParam('id', '');
     setTimeout(() => {
-    this.props.showSubjectsDispatch(id);
-    this.props.getTeachersDispatch()
+    this.props.showSchedulesDispatch(id);
     }, 100)
-
+    setTimeout(() => {
+    this.props.getSubjectsDispatch()
+  }, 500)
   }
+
+  onSelectedItemsChange = selectedItems => {
+      // alert(JSON.stringify(selectedItems));
+    this.setState({ selectedItems });
+  };
 
   saveTeacher = () => {
     const id = this.props.navigation.getParam('id', '');
     setTimeout(() => {
-      this.props.updateSubjectsDispatch(id, this.state.subject_name, this.state.teacher_id, this.state.schedule_start, this.state.schedule_end)
-      this.props.getSubjectsDispatch()
+      this.props.updateSchedulesDispatch(id, this.state.selectedItems)
+      this.props.getSchedulesDispatch()
     }, 100)
     Toast.show({
-        text: `Subject updated`,
+        text: `Schedule updated`,
         duration: 1500
       })
-    this.props.navigation.navigate('Subjects')
+    this.props.navigation.navigate('Schedule_Subject')
 }
 
   render() {
@@ -53,51 +58,58 @@ class UpdateSchedule extends Component {
       return (
       <Container>
       <Content>
-      <FlatList
-        data={this.props.subject}
-        renderItem={({item}) =>(
         <Card>
           <CardItem header bordered>
-            <Text style={styles.txtsubtitle}>Update Name</Text>
+            <Text style={styles.txtsubtitle}>Update Schedule</Text>
           </CardItem>
-          <Text style={{marginLeft:18, fontWeight:'bold', color:'#3a81f7', fontSize:16, marginTop:12}}>Name</Text>
+          <Text style={{marginLeft:18, fontWeight:'bold', color:'#3a81f7', fontSize:16, marginTop:12}}>Day</Text>
           <CardItem>
             <Item rounded style={{height:40, width:318, backgroundColor:'#c5d3e8'}}>
-              <Input placeholder='Subject Name' onChangeText={(subject_name) => this.setState({subject_name})}
-               defaultValue={item.subject_name}/>
-            </Item>
-          </CardItem>
-            <Text style={{marginLeft:18, fontWeight:'bold', color:'#3a81f7', fontSize:16}}>Teacher's Name</Text>
-          <CardItem>
-            <Form style={{width:320, backgroundColor:'#c5d3e8'}}>
-              <Picker
-              mode="dropdown"
-              iosIcon={<Icon name="arrow-down" />}
-              selectedValue={this.state.teacher_id}
-              onValueChange={(itemValue, itemIndex) => this.setState({teacher_id: itemValue})}>
-              <Picker.Item label={item.teacher.teacher_name} value={item.teacher_id} />
-              { this.props.teachers.map((item, key)=>(
-              <Picker.Item label={item.teacher_name} value={item.id} key={key} />)
+              { this.props.schedules.map((item, key)=>(
+              <Input placeholder='Subject Name' defaultValue={item.day} key={key} disabled/>)
               )}
-            </Picker>
-          </Form>
-          </CardItem>
-          <Text style={{marginLeft:18, fontWeight:'bold', color:'#3a81f7', fontSize:16, marginTop:12}}>Schedule</Text>
-          <CardItem>
-            <Item square style={{height:40, width:141, backgroundColor:'#c5d3e8'}}>
-              <Input placeholder='start' onChangeText={(schedule_start) => this.setState({schedule_start})}
-                defaultValue={item.schedule_start}/>
-            </Item>
-            <Text style={{fontWeight:'bold', color:'#3a81f7'}}>  until  </Text>
-            <Item square style={{height:40, width:141, backgroundColor:'#c5d3e8'}}>
-              <Input placeholder='end' onChangeText={(schedule_end) => this.setState({schedule_end})}
-                defaultValue={item.schedule_end}/>
             </Item>
           </CardItem>
         </Card>
-          )}
-        keyExtractor={(item, index) => index.toString()}
-        />
+        <Card>
+
+          <Text style={styles.txtLocation}>Subjects</Text>
+          <CardItem>
+            <View style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'stretch' }} >
+            <MultiSelect
+              hideTags
+              items={this.props.subjects}
+              key={this.props.subjects.id}
+              uniqueKey="id"
+              ref={(component) => { this.multiSelect = component }}
+              onSelectedItemsChange={this.onSelectedItemsChange}
+              selectedItems={this.state.selectedItems}
+              selectText="Pick Subjects"
+              searchInputPlaceholderText="Search Items..."
+              onChangeInput={ (text)=> console.log(text)}
+              altFontFamily="ProximaNova-Light"
+              tagRemoveIconColor="#CCC"
+              tagBorderColor="#CCC"
+              tagTextColor="#CCC"
+              selectedItemTextColor="#CCC"
+              selectedItemIconColor="#CCC"
+              itemTextColor="#000"
+              displayKey="subject_name" 
+              searchInputStyle={{ color: '#CCC' }}
+              submitButtonColor="#CCC"
+              submitButtonText="Submit"
+            />
+              <View>
+                {this.multiSelect
+                  ?
+                  this.multiSelect.getSelectedItemsExt(this.state.selectedItems)
+                  :
+                  null
+                }
+              </View>
+            </View>
+          </CardItem>
+        </Card>
         <Card>
           <CardItem>
             <Button active style={styles.btnCart}
@@ -118,8 +130,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#3a81f7',
   },
   welcome: {
     fontSize: 20,
@@ -185,24 +196,24 @@ const styles = StyleSheet.create({
 });
 
 const mapStateToProps = state => ({
-  pending: state.teachers.pending,
-  subject: state.subjects.dataSingle,
-  teachers: state.teachers.data
+  pending: state.schedules.pending,
+  subjects: state.subjects.data,
+  schedules: state.schedules.dataSingle
 })
 
 const mapDispatchToProps = dispatch => {
   return {
-    getTeachersDispatch: () => {
-      dispatch(getTeachers())
-    },
     getSubjectsDispatch: () => {
       dispatch(getSubjects())
     },
-    showSubjectsDispatch: (id) => {
-      dispatch(showSubjects(id))
+    getSchedulesDispatch: () => {
+      dispatch(getSchedules())
     },
-    updateSubjectsDispatch: (id, subject_name,teacher_id,schedule_start, schedule_end) => {
-      dispatch(updateSubjects(id, subject_name,teacher_id,schedule_start, schedule_end))
+    showSchedulesDispatch: (id) => {
+      dispatch(showSchedules(id))
+    },
+    updateSchedulesDispatch: (id, selectedItems) => {
+      dispatch(updateSchedules(id, selectedItems))
     }
   }
 }

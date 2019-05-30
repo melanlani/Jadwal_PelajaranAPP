@@ -13,6 +13,7 @@ class UpdateSubject extends Component {
     this.state = {
       subject_name: '',
       teacher_id: 0,
+      teacher_name: '',
       schedule_start: '',
       schedule_end: ''
     }
@@ -21,20 +22,34 @@ class UpdateSubject extends Component {
   componentDidMount() {
     const id = this.props.navigation.getParam('id', '');
     setTimeout(() => {
-    this.props.showSubjectsDispatch(id);
+    axios.get(`http://192.168.1.5:3333/api/v1/subjects/subject/${id}`)
+    .then(response => {
+      response.data.result.map((item, key)=>(
+      this.setState({
+        subject_name: item.subject_name,
+        teacher_id: item.teacher_id,
+        teacher_name: item.teacher.teacher_name,
+        schedule_start: item.schedule_start,
+        schedule_end : item.schedule_end
+      }, () => {
+        console.log(this.state);
+      })
+    ));
+    })
     }, 100)
     setTimeout(() => {
     this.props.getTeachersDispatch()
   }, 500)
-
   }
 
   saveTeacher = () => {
     const id = this.props.navigation.getParam('id', '');
     setTimeout(() => {
       this.props.updateSubjectsDispatch(id, this.state.subject_name, this.state.teacher_id, this.state.schedule_start, this.state.schedule_end)
-      this.props.getSubjectsDispatch()
-    }, 100)
+    }, 500)
+      setTimeout(() => {
+        this.props.getSubjectsDispatch()
+    }, 1500)
     Toast.show({
         text: `Subject updated`,
         duration: 1500
@@ -55,9 +70,6 @@ class UpdateSubject extends Component {
       return (
       <Container>
       <Content>
-      <FlatList
-        data={this.props.subject}
-        renderItem={({item}) =>(
         <Card>
           <CardItem header bordered>
             <Text style={styles.txtsubtitle}>Update Name</Text>
@@ -65,8 +77,7 @@ class UpdateSubject extends Component {
           <Text style={{marginLeft:18, fontWeight:'bold', color:'#3a81f7', fontSize:16, marginTop:12}}>Name</Text>
           <CardItem>
             <Item rounded style={{height:40, width:318, backgroundColor:'#c5d3e8'}}>
-              <Input placeholder='Subject Name' onChangeText={(subject_name) => this.setState({subject_name})}
-               defaultValue={item.subject_name} disabled />
+              <Input placeholder='Subject Name' name="subject_name" ref="subject_name" value={this.state.subject_name} disabled/>
             </Item>
           </CardItem>
             <Text style={{marginLeft:18, fontWeight:'bold', color:'#3a81f7', fontSize:16}}>Teacher's Name</Text>
@@ -77,7 +88,7 @@ class UpdateSubject extends Component {
               iosIcon={<Icon name="arrow-down" />}
               selectedValue={this.state.teacher_id}
               onValueChange={(itemValue, itemIndex) => this.setState({teacher_id: itemValue})}>
-              <Picker.Item label={item.teacher.teacher_name} value={item.teacher_id} />
+              <Picker.Item label={this.state.teacher_name} name="teacher_id" ref="teacher_id" value={this.state.teacher_id}/>
               { this.props.teachers.map((item, key)=>(
               <Picker.Item label={item.teacher_name} value={item.id} key={key} />)
               )}
@@ -87,19 +98,14 @@ class UpdateSubject extends Component {
           <Text style={{marginLeft:18, fontWeight:'bold', color:'#3a81f7', fontSize:16, marginTop:12}}>Schedule</Text>
           <CardItem>
             <Item square style={{height:40, width:141, backgroundColor:'#c5d3e8'}}>
-              <Input placeholder='start' onChangeText={(schedule_start) => this.setState({schedule_start})}
-                defaultValue={item.schedule_start}/>
+              <Input placeholder='Subject Name' name="schedule_start" ref="schedule_start" value={this.state.schedule_start} onChangeText={(schedule_start) => this.setState({schedule_start})}/>
             </Item>
             <Text style={{fontWeight:'bold', color:'#3a81f7'}}>  until  </Text>
             <Item square style={{height:40, width:141, backgroundColor:'#c5d3e8'}}>
-              <Input placeholder='end' onChangeText={(schedule_end) => this.setState({schedule_end})}
-                defaultValue={item.schedule_end}/>
+              <Input placeholder='Subject Name' name="schedule_end" ref="schedule_end" value={this.state.schedule_end} onChangeText={(schedule_end) => this.setState({schedule_end})}/>
             </Item>
           </CardItem>
         </Card>
-          )}
-        keyExtractor={(item, index) => index.toString()}
-        />
         <Card>
           <CardItem>
             <Button active style={styles.btnCart}
@@ -120,8 +126,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
+    backgroundColor: '#3a81f7',
   },
   welcome: {
     fontSize: 20,
